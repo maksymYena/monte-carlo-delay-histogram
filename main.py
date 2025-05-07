@@ -1,41 +1,47 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import tkinter as tk
-from tkinter import ttk
 
+# Параметри симуляції
+lam = 0.2
+samples = 1000
 
-def run_simulation():
-    try:
-        lam = float(entry_lambda.get())
-        samples = int(entry_samples.get())
-        delays = np.random.exponential(1 / lam, samples)
+# Генерація експоненційно розподілених затримок
+delays = np.random.exponential(1 / lam, samples)
 
-        plt.figure(figsize=(8, 4))
-        plt.hist(delays, bins=30, color='lightgreen', edgecolor='black', density=True)
-        plt.title(f"Розподіл затримок (λ={lam}, N={samples})")
-        plt.xlabel("Затримка")
-        plt.ylabel("Щільність")
-        plt.grid(True)
-        plt.show()
-    except ValueError:
-        print("Неправильні вхідні дані")
+# Обчислення середнього значення (мат. сподівання) та дисперсії
+mean_delay = np.mean(delays)
+var_delay = np.var(delays)
 
+# Побудова гістограми
+plt.figure(figsize=(8, 4))
+plt.hist(delays, bins=30, color='lightgreen', edgecolor='black', density=True)
+plt.title(f"Гістограма розподілу затримок (λ={lam}, N={samples})")
+plt.xlabel("Затримка")
+plt.ylabel("Щільність")
+plt.grid(True)
+plt.show()
 
-# GUI
-root = tk.Tk()
-root.title("Модель затримки Монте-Карло")
+# Побудова лінії середнього значення
+plt.figure(figsize=(8, 4))
+plt.hist(delays, bins=30, color='lightgrey', edgecolor='black', density=True)
+plt.axvline(mean_delay, color='blue', linestyle='dashed', linewidth=2, label=f"E[τ] = {mean_delay:.2f}")
+plt.title("Середнє значення (мат. сподівання)")
+plt.xlabel("Затримка")
+plt.ylabel("Щільність")
+plt.legend()
+plt.grid(True)
+plt.show()
 
-tk.Label(root, text="λ (інтенсивність):").grid(row=0, column=0)
-entry_lambda = ttk.Entry(root)
-entry_lambda.insert(0, "0.5")
-entry_lambda.grid(row=0, column=1)
-
-tk.Label(root, text="Кількість симуляцій:").grid(row=1, column=0)
-entry_samples = ttk.Entry(root)
-entry_samples.insert(0, "1000")
-entry_samples.grid(row=1, column=1)
-
-btn = ttk.Button(root, text="Побудувати графік", command=run_simulation)
-btn.grid(row=2, column=0, columnspan=2)
-
-root.mainloop()
+# Побудова розкиду навколо середнього (±σ)
+std_dev = np.sqrt(var_delay)
+plt.figure(figsize=(8, 4))
+plt.hist(delays, bins=30, color='lightgrey', edgecolor='black', density=True)
+plt.axvline(mean_delay, color='blue', linestyle='dashed', linewidth=2, label=f"E[τ] = {mean_delay:.2f}")
+plt.axvline(mean_delay + std_dev, color='red', linestyle='dotted', linewidth=2, label=f"+σ = {std_dev:.2f}")
+plt.axvline(mean_delay - std_dev, color='red', linestyle='dotted', linewidth=2, label=f"-σ = {std_dev:.2f}")
+plt.title("Дисперсія (розкиди навколо середнього)")
+plt.xlabel("Затримка")
+plt.ylabel("Щільність")
+plt.legend()
+plt.grid(True)
+plt.show()
